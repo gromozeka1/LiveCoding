@@ -30,13 +30,13 @@ jobs:
           docker compose up --build --exit-code-from regression
         continue-on-error: true
 
-      # Restore Allure 3 history.jsonl
+      - name: Fix permissions
+        run: sudo chown -R $USER:$USER allure-results || true
+
       - name: Restore Allure history
         run: |
           mkdir -p allure-results/history
-          if [ -f gh-pages-history/history/history.jsonl ]; then
-            cp gh-pages-history/history/history.jsonl allure-results/history/
-          fi
+          cp gh-pages-history/history/history.jsonl allure-results/history/ || true
 
       # Install Allure 3 via npm (recommended)
       - name: Install Allure CLI (Allure 3)
