@@ -14,6 +14,11 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
       # Checkout previous Allure report history
       - name: Checkout Allure history
         uses: actions/checkout@v4
@@ -27,11 +32,11 @@ jobs:
           LOGIN: ${{ secrets.LOGIN }}
           PASSWORD: ${{ secrets.PASSWORD }}
         run: |
-          docker compose up --build --exit-code-from regression
+          docker compose up --build --exit-code-from regression --abort-on-container-exit
         continue-on-error: true
 
       - name: Fix permissions
-        run: sudo chown -R $USER:$USER allure-results || true
+        run: sudo chown -R $(id -u):$(id -g) allure-results || true
 
       - name: Restore Allure history
         run: |
@@ -41,24 +46,24 @@ jobs:
       # Install Allure 3 via npm (recommended)
       - name: Install Allure CLI (Allure 3)
         run: |
-          npm install -g allure-commandline
+          npm install -g allure-commandline || true
 
       # Generate report
       - name: Generate Allure report
         run: |
-          allure generate allure-results
+          allure generate allure-results -o allure-report --clean || true
 
       # Save updated history.jsonl
       - name: Save Allure history
         run: |
           mkdir -p gh-pages-history/history
-          cp history.jsonl gh-pages-history/history/
+          cp allure-results/history/history.jsonl gh-pages-history/history/ || true
 
       # Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          token: ${{ secrets.CI_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           branch: gh-pages
           folder: allure-report
           clean: true
