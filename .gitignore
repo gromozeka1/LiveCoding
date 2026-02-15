@@ -4,3 +4,8 @@
 allure-report
 allure-results
 history.jsonl
+
+# Ignore Python bytecode/cache
+__pycache__/
+*.py[cod]
+*.pyc
