@@ -1,0 +1,75 @@
+name: UI Automation CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  ui-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      # Checkout previous Allure report history
+      - name: Checkout Allure history
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: gh-pages-history
+
+      # Run tests
+      - name: Build & Run UI tests in Docker
+        env:
+          LOGIN: ${{ secrets.LOGIN }}
+          PASSWORD: ${{ secrets.PASSWORD }}
+        run: |
+          docker compose up --build --exit-code-from regression
+        continue-on-error: true
+
+      # Restore Allure 3 history.jsonl
+      - name: Restore Allure history
+        run: |
+          mkdir -p allure-results/history
+          if [ -f gh-pages-history/history/history.jsonl ]; then
+            cp gh-pages-history/history/history.jsonl allure-results/history/
+          fi
+
+      # Install Allure 3 via npm (recommended)
+      - name: Install Allure CLI (Allure 3)
+        run: |
+          npm install -g allure-commandline
+
+      # Generate report
+      - name: Generate Allure report
+        run: |
+          allure generate allure-results
+
+      # Save updated history.jsonl
+      - name: Save Allure history
+        run: |
+          mkdir -p gh-pages-history/history
+          cp history.jsonl gh-pages-history/history/
+
+      # Deploy to GitHub Pages
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          token: ${{ secrets.CI_TOKEN }}
+          branch: gh-pages
+          folder: allure-report
+          clean: true
+
+      # Upload artifacts
+      - name: Upload artifacts (debugging)
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-test-artifacts
+          path: |
+            allure-results
+            allure-report
+            screenshots
+            logs

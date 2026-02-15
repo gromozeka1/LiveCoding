@@ -1,0 +1,6 @@
+.env
+.idea
+
+allure-report
+allure-results
+history.jsonl

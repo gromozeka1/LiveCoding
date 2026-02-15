@@ -1,0 +1,58 @@
+{
+  "name": "Allure Report",
+  "output": "./allure-report",
+  "historyPath": "./history.jsonl",
+  "qualityGate": {
+    "rules": [
+      {
+        "maxFailures": 5,
+        "fastFail": true
+      }
+    ]
+  },
+  "plugins": {
+    "awesome": {
+      "options": {
+        "reportName": "HelloWorld",
+        "singleFile": false,
+        "reportLanguage": "en",
+        "open": false,
+        "publish": true
+      }
+    },
+    "allure2": {
+      "options": {
+        "reportName": "HelloWorld",
+        "singleFile": false,
+        "reportLanguage": "en"
+      }
+    },
+    "classic": {
+      "options": {
+        "reportName": "HelloWorld",
+        "singleFile": false,
+        "reportLanguage": "en"
+      }
+    },
+    "dashboard": {
+      "options": {
+        "singleFile": false,
+        "reportName": "HelloWorld-Dashboard",
+        "reportLanguage": "en"
+      }
+    },
+    "csv": {
+      "options": {
+        "fileName": "allure-report.csv"
+      }
+    },
+    "log": {
+      "options": {
+        "groupBy": "none"
+      }
+    }
+  },
+  "variables": {
+    "env_variable": "unknown"
+  }
+}
