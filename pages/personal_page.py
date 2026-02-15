@@ -24,7 +24,18 @@ class PersonalPage(BasePage):
 
     @allure.step('Save changes')
     def save_changes(self):
-        self.wait.until(EC.element_to_be_clickable(self.SAVE_BUTTON)).click()
+        # ensure any form loader is gone before clicking
+        try:
+            self.wait.until(EC.invisibility_of_element_located(self.FORM_LOADER))
+        except Exception:
+            pass
+
+        btn = self.wait.until(EC.element_to_be_clickable(self.SAVE_BUTTON))
+        try:
+            btn.click()
+        except Exception:
+            # fallback to JS click when an overlay intermittently intercepts the click
+            self.driver.execute_script("arguments[0].click();", btn)
 
     @allure.step('Changes have been saved')
     def is_changes_saved(self):
