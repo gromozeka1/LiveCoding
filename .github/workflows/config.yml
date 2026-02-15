@@ -64,14 +64,14 @@ jobs:
           mkdir -p gh-pages-history/history
           cp allure-results/history/history.jsonl gh-pages-history/history/ || true
 
-      # Deploy to GitHub Pages
-      - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@v4
+      # Deploy to GitHub Pages using the official Actions (supports GITHUB_TOKEN)
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v1
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          branch: gh-pages
-          folder: allure-report
-          clean: true
+          path: allure-report
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v1
 
       # Upload artifacts
       - name: Upload artifacts (debugging)
